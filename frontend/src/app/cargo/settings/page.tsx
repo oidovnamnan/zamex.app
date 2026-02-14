@@ -1,12 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/store';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { Save, Building2, Smartphone, MapPin, Globe, CreditCard, ShieldCheck, Key, Plus, Trash2, Eye, Copy, Check } from 'lucide-react';
-import { useEffect } from 'react';
-import { api } from '@/lib/api';
 
 export default function CargoSettingsPage() {
     const { user } = useAuth();
