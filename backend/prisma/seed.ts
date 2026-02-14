@@ -37,7 +37,7 @@ async function main() {
             password: 'admin123',
             firstName: 'Super',
             lastName: 'Admin',
-            role: 'SUPER_ADMIN' as UserRole,
+            role: UserRole.SUPER_ADMIN,
             companyId: null,
         },
         {
@@ -45,7 +45,7 @@ async function main() {
             password: 'customer123',
             firstName: 'Demo',
             lastName: 'Customer',
-            role: 'CUSTOMER' as UserRole,
+            role: UserRole.CUSTOMER,
             companyId: null,
         },
         {
@@ -53,7 +53,7 @@ async function main() {
             password: 'cargo123456',
             firstName: 'Demo',
             lastName: 'Cargo Admin',
-            role: 'CARGO_ADMIN' as UserRole,
+            role: UserRole.CARGO_ADMIN,
             companyId: company.id,
         },
         {
@@ -61,7 +61,7 @@ async function main() {
             password: 'staffchina123',
             firstName: 'Demo',
             lastName: 'Erlian Staff',
-            role: 'STAFF_ERLIAN' as UserRole,
+            role: UserRole.STAFF_ERLIAN,
             companyId: company.id,
         },
         {
@@ -69,7 +69,7 @@ async function main() {
             password: 'staffmn123',
             firstName: 'Demo',
             lastName: 'UB Staff',
-            role: 'STAFF_MONGOLIA' as UserRole,
+            role: UserRole.STAFF_MONGOLIA,
             companyId: company.id,
         },
         {
@@ -77,7 +77,7 @@ async function main() {
             password: 'driver123456',
             firstName: 'Demo',
             lastName: 'Driver',
-            role: 'DRIVER' as UserRole,
+            role: UserRole.DRIVER,
             companyId: company.id,
         },
     ];
