@@ -6,6 +6,8 @@ import { v4 as uuid } from 'uuid';
 import { prisma } from '../../server';
 import { AppError } from '../../middleware/errorHandler';
 import { authenticate, JwtPayload } from '../../middleware/auth';
+import { admin } from '../../lib/firebase-admin';
+
 
 export const authRouter = Router();
 
@@ -234,7 +236,80 @@ authRouter.post('/otp/verify', async (req: Request, res: Response, next: NextFun
   } catch (e) { next(e); }
 });
 
+// POST /api/auth/firebase/verify
+authRouter.post('/firebase/verify', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { idToken, firstName, password } = req.body;
+    if (!idToken) throw new AppError('ID Token шаардлагатай', 400);
+
+    // Verify the Firebase ID Token
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const phone = decodedToken.phone_number; // e.g. +97688111010
+
+    if (!phone) {
+      throw new AppError('Утасны дугаар баталгаажсангүй', 400);
+    }
+
+    // Standardize phone format (remove +976 or similar if needed for internal storage)
+    const cleanPhone = phone.replace(/^\+976/, '');
+
+    let user = await prisma.user.findUnique({ where: { phone: cleanPhone } });
+
+    if (!user) {
+      // Auto-register if user doesn't exist
+      user = await prisma.user.create({
+        data: {
+          phone: cleanPhone,
+          firstName: firstName || `User ${cleanPhone.slice(-4)}`,
+          password: password ? await bcrypt.hash(password, 12) : await bcrypt.hash(uuid(), 12),
+          role: 'CUSTOMER',
+          otpVerified: true, // They verified via Firebase
+          isActive: true,
+        },
+      });
+    }
+    else {
+      // Mark as verified if not already
+      if (!user.otpVerified) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { otpVerified: true, lastLogin: new Date() },
+        });
+      } else {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { lastLogin: new Date() },
+        });
+      }
+    }
+
+    const payload: JwtPayload = { userId: user.id, role: user.role, companyId: user.companyId || undefined };
+    const tokens = generateTokens(payload);
+
+    await prisma.refreshToken.create({
+      data: {
+        token: tokens.refreshToken,
+        userId: user.id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    });
+
+    res.json({
+      success: true,
+      message: 'Баталгаажлаа',
+      data: {
+        user: { id: user.id, phone: user.phone, firstName: user.firstName, role: user.role },
+        tokens,
+      },
+    });
+  } catch (e) {
+    console.error('Firebase verify error:', e);
+    next(new AppError('Firebase баталгаажуулалт амжилтгүй', 401));
+  }
+});
+
 // POST /api/auth/login
+
 authRouter.post('/login', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = loginSchema.parse(req.body);

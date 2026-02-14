@@ -7,6 +7,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Package, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/lib/store';
 import toast from 'react-hot-toast';
+import { auth, RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from '@/lib/firebase';
+import { useEffect, useRef } from 'react';
+
 
 import { Suspense } from 'react';
 
@@ -24,8 +27,23 @@ function AuthForm() {
   const [otp, setOtp] = useState('');
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
 
-  const { login, register, verifyOtp, requestOtp } = useAuth();
+  const { login, register, verifyOtp, requestOtp, firebaseVerify } = useAuth();
+
+  useEffect(() => {
+    // Initialize reCAPTCHA verifier
+    if (typeof window !== 'undefined' && !recaptchaVerifierRef.current) {
+      recaptchaVerifierRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+        callback: () => {
+          // reCAPTCHA solved, will allow signInWithPhoneNumber.
+        },
+      });
+    }
+  }, []);
+
 
   const redirectByRole = (role: string) => {
     switch (role) {
@@ -71,44 +89,77 @@ function AuthForm() {
     e.preventDefault();
     setLoading(true);
     try {
-      await requestOtp(authMethod === 'otp_phone' ? phone : undefined, authMethod === 'otp_email' ? email : undefined);
-      setMode('otp');
-      toast.success('OTP код илгээлээ');
+      if (authMethod === 'otp_phone') {
+        const formattedPhone = phone.startsWith('+') ? phone : `+976${phone}`;
+        const result = await signInWithPhoneNumber(auth, formattedPhone, recaptchaVerifierRef.current!);
+        setConfirmationResult(result);
+        setMode('otp');
+        toast.success('Баталгаажуулах код илгээлээ (Firebase)');
+      } else {
+        await requestOtp(undefined, email);
+        setMode('otp');
+        toast.success('OTP код илгээлээ');
+      }
     } catch (err: any) {
-      toast.error(err.response?.data?.error || 'OTP илгээхэд алдаа гарлаа');
+      console.error('Phone request error:', err);
+      toast.error(err.message || 'OTP илгээхэд алдаа гарлаа');
+      // If error is related to recaptcha, reset it
+      if (recaptchaVerifierRef.current) {
+        recaptchaVerifierRef.current.clear();
+        recaptchaVerifierRef.current = null;
+      }
     }
     setLoading(false);
   };
+
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await register(phone, firstName, password);
+      const formattedPhone = phone.startsWith('+') ? phone : `+976${phone}`;
+      const result = await signInWithPhoneNumber(auth, formattedPhone, recaptchaVerifierRef.current!);
+      setConfirmationResult(result);
       setMode('otp');
-      toast.success('OTP код илгээлээ');
+      toast.success('Бүртгэлийн код илгээлээ (Firebase)');
     } catch (err: any) {
-      toast.error(err.response?.data?.error || 'Бүртгэлд алдаа гарлаа');
+      console.error('Register request error:', err);
+      toast.error(err.message || 'Бүртгэлд алдаа гарлаа');
     }
     setLoading(false);
   };
+
 
   const handleOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const data = await verifyOtp(
-        otp,
-        (authMethod === 'otp_phone' || mode === 'register' || authMethod === 'password') ? phone : undefined,
-        authMethod === 'otp_email' ? email : undefined
-      );
-      toast.success('Амжилттай!');
-      redirectByRole(data.data.user.role);
+      if (confirmationResult) {
+        // Firebase verification
+        const result = await confirmationResult.confirm(otp);
+        const idToken = await result.user.getIdToken();
+
+        // Finalize with backend
+        const data = await firebaseVerify(
+          idToken,
+          mode === 'register' ? firstName : undefined,
+          mode === 'register' ? password : undefined
+        );
+        toast.success('Амжилттай!');
+        redirectByRole(data.data.user.role);
+      } else {
+        // Legacy backend verification (Email)
+        const data = await verifyOtp(otp, undefined, email);
+        toast.success('Амжилттай!');
+        redirectByRole(data.data.user.role);
+      }
     } catch (err: any) {
-      toast.error(err.response?.data?.error || 'OTP буруу');
+      console.error('OTP verify error:', err);
+      toast.error(err.message || 'OTP буруу');
     }
     setLoading(false);
   };
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-slate-50 py-12">
@@ -180,15 +231,15 @@ function AuthForm() {
                 <div className="mb-8 relative h-20">
                   <input
                     type="tel"
-                    maxLength={4}
+                    maxLength={confirmationResult ? 6 : 4}
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                     className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-text"
                     autoFocus
                     autoComplete="one-time-code"
                   />
-                  <div className="flex gap-4 h-full">
-                    {[0, 1, 2, 3].map((i) => (
+                  <div className="flex gap-2 h-full">
+                    {[...Array(confirmationResult ? 6 : 4)].map((_, i) => (
                       <div
                         key={i}
                         className={`flex-1 rounded-2xl flex items-center justify-center text-3xl font-black transition-all ${otp.length > i
@@ -206,7 +257,7 @@ function AuthForm() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
-                  disabled={otp.length !== 4 || loading}
+                  disabled={otp.length !== (confirmationResult ? 6 : 4) || loading}
                   className="w-full bg-slate-950 text-white rounded-2xl py-5 font-black text-sm uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-slate-900/10 disabled:opacity-50"
                 >
                   {loading ? 'Шалгаж байна...' : 'Баталгаажуулах'}
@@ -444,7 +495,9 @@ function AuthForm() {
           &copy; 2026 ZAMEX LOGISTICS SYSTEM. ALL RIGHTS RESERVED.
         </p>
       </div>
+      <div id="recaptcha-container" />
     </div>
+
   );
 }
 

@@ -31,6 +31,7 @@ interface AuthStore {
   register: (phone: string, firstName: string, password: string) => Promise<any>;
   requestOtp: (phone?: string, email?: string) => Promise<any>;
   verifyOtp: (otp: string, phone?: string, email?: string) => Promise<any>;
+  firebaseVerify: (idToken: string, firstName?: string, password?: string) => Promise<any>;
   logout: () => void;
   fetchMe: () => Promise<void>;
 }
@@ -80,6 +81,21 @@ export const useAuth = create<AuthStore>((set) => ({
     set({ loading: true });
     try {
       const { data } = await api.post('/auth/otp/verify', { otp, phone, email });
+      if (data.data.tokens) {
+        localStorage.setItem('zamex_token', data.data.tokens.accessToken);
+        localStorage.setItem('zamex_refresh', data.data.tokens.refreshToken);
+        set({ user: data.data.user, loading: false });
+      }
+      return data;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  firebaseVerify: async (idToken: string, firstName?: string, password?: string) => {
+    set({ loading: true });
+    try {
+      const { data } = await api.post('/auth/firebase/verify', { idToken, firstName, password });
       if (data.data.tokens) {
         localStorage.setItem('zamex_token', data.data.tokens.accessToken);
         localStorage.setItem('zamex_refresh', data.data.tokens.refreshToken);
