@@ -11,12 +11,14 @@ try {
             const serviceAccount = JSON.parse(serviceAccountVar);
             admin.initializeApp({
                 credential: admin.credential.cert(serviceAccount),
+                storageBucket: 'zamex-40ec0.firebasestorage.app',
             });
             console.log('✅ Firebase Admin initialized from Environment Variable');
         } else {
             // Fallback to local file
             admin.initializeApp({
                 credential: admin.credential.cert(serviceAccountPath),
+                storageBucket: 'zamex-40ec0.firebasestorage.app',
             });
             console.log('✅ Firebase Admin initialized from Local File');
         }
