@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="mn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAN SSO Холболтын Хүсэлт - Ийст Холдинг ХХК</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+        :root {
+            --brand-color: #000;
+            --accent-color: #FF6B00;
+            --text-main: #111;
+            --text-muted: #666;
+            --page-width: 210mm;
+            --page-height: 297mm;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f0f2f5;
+            font-family: 'Times New Roman', serif;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .paper {
+            width: var(--page-width);
+            min-height: var(--page-height);
+            margin: 20mm auto;
+            background: white;
+            padding: 25mm 25mm 20mm 25mm;
+            position: relative;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.08);
+        }
+
+        @media print {
+            body {
+                background: none;
+            }
+
+            .paper {
+                margin: 0;
+                box-shadow: none;
+                width: 100%;
+                height: auto;
+            }
+
+            .no-print {
+                display: none;
+            }
+        }
+
+        /* Essential Ultra-Clean Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20mm;
+            padding-bottom: 8mm;
+            border-bottom: 0.5pt solid #ddd;
+        }
+
+        .brand-box {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .brand-divider {
+            width: 1pt;
+            height: 40px;
+            background: #eee;
+        }
+
+        .brand-text h1 {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: 22pt;
+            letter-spacing: -1.2pt;
+            line-height: 0.9;
+            color: #000;
+            text-transform: uppercase;
+        }
+
+        .brand-text .sub {
+            font-family: 'Inter', sans-serif;
+            font-size: 8pt;
+            color: var(--accent-color);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-top: 5px;
+        }
+
+        .contact-info {
+            text-align: right;
+            font-family: 'Inter', sans-serif;
+            font-size: 8pt;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .contact-info b {
+            color: #000;
+            font-weight: 700;
+        }
+
+        .meta-container {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11pt;
+            font-weight: bold;
+            margin-bottom: 15mm;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .recipient {
+            margin-left: auto;
+            width: 110mm;
+            text-align: right;
+            margin-bottom: 25mm;
+            font-weight: bold;
+            font-size: 11.5pt;
+            line-height: 1.5;
+        }
+
+        .subject {
+            text-align: center;
+            font-weight: bold;
+            font-size: 11.5pt;
+            text-decoration: underline;
+            margin-bottom: 15mm;
+            text-transform: uppercase;
+        }
+
+        .body-text {
+            text-align: justify;
+            font-size: 10.5pt;
+            margin-bottom: 8mm;
+            text-indent: 12mm;
+        }
+
+        .tech-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10mm 0;
+            font-size: 10pt;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .tech-table td {
+            padding: 10px 15px;
+            border: 0.5pt solid #eee;
+        }
+
+        .tech-table td:first-child {
+            background: #fafafa;
+            font-weight: 600;
+            width: 160px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 7.5pt;
+        }
+
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 25mm;
+        }
+
+        .sig-label {
+            font-weight: bold;
+            font-size: 11pt;
+            margin-bottom: 40px;
+        }
+
+        .seal-placeholder {
+            width: 35mm;
+            height: 35mm;
+            border: 0.5pt dashed #ccc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-size: 8pt;
+            text-align: center;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 15mm;
+            left: 25mm;
+            right: 25mm;
+            text-align: center;
+            font-size: 8.5pt;
+            color: #999;
+            border-top: 0.5pt solid #eee;
+            padding-top: 5mm;
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-35deg);
+            font-size: 100pt;
+            font-weight: 900;
+            color: rgba(0, 0, 0, 0.025);
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+            pointer-events: none;
+            user-select: none;
+            z-index: 0;
+            letter-spacing: -0.05em;
+        }
+
+        .print-btn {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            padding: 10px 20px;
+            background: #000;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <button class="print-btn no-print" onclick="window.print()">Хэвлэх (PDF)</button>
+
+    <div class="paper">
+        <div class="watermark">EAST HOLDING</div>
+        <div class="header">
+            <div class="brand-box">
+                <svg width="60" height="60" viewBox="0 0 100 100">
+                    <!-- Clean Architectural Roof -->
+                    <path d="M15 42 L50 18 L85 42" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round"
+                        stroke-linejoin="round" />
+
+                    <!-- E-Box (Left side) -->
+                    <path d="M25 45 V85 H55 V45 Z" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    <path d="M25 65 H55" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" />
+
+                    <!-- H-Leg (Right side) -->
+                    <path d="M75 45 V85" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" />
+                    <path d="M55 65 H75" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" />
+                </svg>
+                <div class="brand-divider"></div>
+                <div class="brand-text">
+                    <h1>EAST HOLDING</h1>
+                    <div class="sub">Logistics & Technology</div>
+                </div>
+            </div>
+            <div class="contact-info">
+                <div><b>TEL:</b> (+976) 9000-7878</div>
+                <div><b>WEB:</b> ZAMEX.APP</div>
+                <div><b>REG:</b> 5700272</div>
+            </div>
+        </div>
+
+        <div class="meta-container">
+            <div>Дугаар: 2026/02-____</div>
+            <div>Огноо: 2026.02.11</div>
+        </div>
+
+        <div class="recipient">
+            ЦАХИМ ХӨГЖИЛ, ХАРИЛЦАА ХОЛБООНЫ ЯАМНЫ<br>
+            ТӨРИЙН НАРИЙН БИЧГИЙН ДАРГА ТАНАА
+        </div>
+
+        <div class="subject">
+            Хүсэлт гаргах тухай
+        </div>
+
+        <div class="body-text">
+            "Ийст Холдинг" ХХК нь гадаад худалдаа, ложистик болон мэдээллийн технологийн чиглэлээр үйл ажиллагаа
+            явуулдаг бөгөөд хэрэглэгчийн бүртгэлийн үнэн зөв байдал, нууцлал, аюулгүй байдлыг хангах зорилгоор "ZAMEX"
+            карго удирдлагын системдээ Төрийн нэгдсэн систем болох "DAN" SSO-г ашиглах хүсэлтэй байна.
+        </div>
+
+        <div class="body-text">
+            Иймд манай системийг DAN системд холбож, OAuth 2.0 холболтын эрх олгож өгнө үү. Техникийн мэдээллийг доорх
+            хүснэгтээр хүргүүлж байна:
+        </div>
+
+        <table class="tech-table">
+            <tr>
+                <td>Байгууллагын нэр</td>
+                <td>"Ийст Холдинг" ХХК</td>
+            </tr>
+            <tr>
+                <td>Системийн домэйн</td>
+                <td>zamex.app</td>
+            </tr>
+            <tr>
+                <td>Redirect URI</td>
+                <td>https://api.zamex.app/api/auth/callback/dan</td>
+            </tr>
+            <tr>
+                <td>Хариуцах хүн</td>
+                <td>О. Намнансүрэн</td>
+            </tr>
+        </table>
+
+        <div class="body-text">
+            Манай систем нь SSL/TLS нууцлалын олон улсын стандартыг бүрэн хангаж, хэрэглэгчийн өгөгдлийн аюулгүй байдлыг
+            тэргүүн эгнээнд тавин ажилладаг болно.
+        </div>
+
+        <div class="signature-section">
+            <div>
+                <div class="sig-label">ГҮЙЦЭТГЭХ ЗАХИРАЛ</div>
+                <br>
+                .......................................... / О. НАМНАНСҮРЭН /
+            </div>
+            <div class="seal-placeholder">
+                ТАМГА ТЭМДЭГ
+            </div>
+        </div>
+
+        <div class="footer">
+            Монгол улс, Улаанбаатар хот, СХД, Москва хороолол, 133/1-3 тоот
+        </div>
+    </div>
+
+</body>
+
+</html>

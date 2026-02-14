@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --zamex-indigo: #283480;
+    --zamex-mustard: #F9BE4A;
+    --zamex-fern: #45B69F;
+    --slate-base: #f8fafc;
+    --radius: 20px;
+    --shadow-premium: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, system-ui, sans-serif;
+    font-feature-settings: 'cv11', 'ss01', 'ss03';
+    letter-spacing: -0.01em;
+  }
+
+  * {
+    @apply border-slate-200/60;
+  }
+}
+
+@layer components {
+
+  /* Minimalist Precision Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-bold rounded-[16px] px-6 py-3 text-[13px] transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-primary {
+    @apply btn bg-[#283480] text-white hover:bg-[#1A235D] active:scale-[0.98] shadow-xl shadow-[#283480]/10;
+  }
+
+  .btn-ghost {
+    @apply btn text-[#283480] hover:text-[#1A235D] hover:bg-[#283480]/5;
+  }
+
+  .btn-blue {
+    @apply btn bg-[#283480] text-white hover:bg-[#1A235D] shadow-sm active:scale-[0.98];
+  }
+
+  .btn-mustard {
+    @apply btn bg-[#F9BE4A] text-[#283480] hover:bg-[#E8AD39] shadow-xl shadow-[#F9BE4A]/10 active:scale-[0.98];
+  }
+
+  /* Perfectly Organized Grid Cards */
+  .grid-card {
+    @apply relative overflow-hidden bg-white rounded-[28px] border border-slate-200/50 shadow-sm transition-all duration-500 hover:border-slate-300 hover:shadow-2xl hover:shadow-slate-200/60 hover:-translate-y-1;
+  }
+
+  /* Minimal Badge */
+  .badge-minimal {
+    @apply inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-200/40 text-slate-600 text-[10px] font-extrabold uppercase tracking-[0.1em];
+  }
+}
+
+/* Texture */
+.bg-subtle-grid {
+  background-image: linear-gradient(to right, #e2e8f0 1px, transparent 1px),
+    linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
+  background-size: 100px 100px;
+  mask-image: radial-gradient(ellipse at center, black, transparent 80%);
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+@keyframes gradient-x {
+
+  0%,
+  100% {
+    background-size: 200% 200%;
+    background-position: left center;
+  }
+
+  50% {
+    background-size: 200% 200%;
+    background-position: right center;
+  }
+}
+
+.animate-gradient-x {
+  animation: gradient-x 5s ease infinite;
+}
+
+.text-glow {
+  text-shadow: 0 0 40px rgba(249, 190, 74, 0.4);
+}

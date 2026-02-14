@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="mn">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Zamex System Documentation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --primary: #1e293b;
+            --secondary: #334155;
+            --accent: #2563eb;
+            --text: #0f172a;
+            --light-gray: #f1f5f9;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background: #cbd5e1;
+            /* Background specifically for screen viewing */
+        }
+
+        /* A4 Paper Setup */
+        .page {
+            width: 21cm;
+            min-height: 29.7cm;
+            padding: 2.5cm;
+            margin: 2cm auto;
+            background: white;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        @media print {
+            body {
+                background: none;
+                margin: 0;
+            }
+
+            .page {
+                margin: 0;
+                box-shadow: none;
+                width: 100%;
+                height: auto;
+                break-after: page;
+            }
+
+            .no-print {
+                display: none;
+            }
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 24pt;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 0.5cm;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        h2 {
+            font-size: 16pt;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-top: 1cm;
+            margin-bottom: 0.5cm;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            font-size: 12pt;
+            font-weight: 700;
+            color: var(--accent);
+            margin-top: 0.5cm;
+            margin-bottom: 0.2cm;
+            text-transform: uppercase;
+        }
+
+        p,
+        li {
+            font-size: 10pt;
+            text-align: justify;
+            margin-bottom: 0.3cm;
+            color: #334155;
+        }
+
+        /* Components */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1cm;
+            margin-bottom: 1cm;
+        }
+
+        .stat-box {
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 8px;
+            background: var(--light-gray);
+        }
+
+        .stat-label {
+            font-size: 8pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+
+        .stat-value {
+            font-size: 12pt;
+            font-weight: 900;
+            color: var(--primary);
+            margin-top: 5px;
+        }
+
+        .diagram {
+            border: 1px dashed #94a3b8;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 1cm 0;
+            text-align: center;
+        }
+
+        .flow-step {
+            display: inline-block;
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 9pt;
+        }
+
+        .arrow {
+            display: inline-block;
+            margin: 0 10px;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .tech-tag {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #eff6ff;
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8pt;
+            border-radius: 4px;
+            border: 1px solid #bfdbfe;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1cm 0;
+            font-size: 9pt;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        th {
+            background: var(--light-gray);
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            font-size: 8pt;
+        }
+
+        /* Cover Page Specifics */
+        .cover-content {
+            height: 24cm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .cover-logo {
+            font-size: 40pt;
+            font-weight: 900;
+            color: var(--accent);
+            margin-bottom: 1cm;
+            letter-spacing: -2px;
+        }
+
+        .cover-subtitle {
+            font-size: 14pt;
+            color: #64748b;
+            font-weight: 300;
+            margin-bottom: 2cm;
+        }
+
+        .cover-meta {
+            border-top: 1px solid var(--border);
+            padding-top: 1cm;
+            margin-top: auto;
+            font-size: 9pt;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- PAGE 1: COVER -->
+    <div class="page">
+        <div class="cover-content">
+            <div class="cover-logo">ZAMEX SYSTEM</div>
+            <h1 style="font-size: 28pt; margin: 0;">TECHNICAL DOCUMENTATION</h1>
+            <div class="cover-subtitle">Complete Architecture, Workflow & Governance Report</div>
+
+            <div style="margin-top: 3cm;">
+                <div class="info-grid">
+                    <div>
+                        <div class="stat-label">System Version</div>
+                        <div class="stat-value">v2.4.0 (Production Ready)</div>
+                    </div>
+                    <div>
+                        <div class="stat-label">Last Updated</div>
+                        <div class="stat-value">2026-02-14</div>
+                    </div>
+                    <div>
+                        <div class="stat-label">Platform Type</div>
+                        <div class="stat-value">Freight Marketplace & Logistics Management</div>
+                    </div>
+                    <div>
+                        <div class="stat-label">Modules</div>
+                        <div class="stat-value">Logistics, Finance, Governance, Marketplace</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cover-meta">
+                <p><strong>Confidentiality Notice:</strong> This document contains proprietary information regarding the
+                    Zamex system architecture and business logic.</p>
+                <p>Developed by: Zamex Engineering Team</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 2: EXECUTIVE SUMMARY & TECH STACK -->
+    <div class="page">
+        <h1>1. Executive Summary</h1>
+        <p>
+            Zamex нь БНХАУ-аас Монгол Улс руу хийгдэх карго тээвэрлэлтийг дижитал хэлбэрт шилжүүлсэн, олон талт
+            ложистикийн платформ юм.
+            Энэхүү систем нь тээвэрлэгч компаниуд (Partners), хэрэглэгчид (Clients), болон системийн админ (Super Admin)
+            гэсэн гурван үндсэн оролцогч талыг нэгтгэдэг.
+        </p>
+        <p>
+            Системийн гол зорилго нь тээвэрлэлтийн ил тод байдлыг хангах, төлбөр тооцоог автоматжуулах (E-Barimt),
+            болон тээвэрлэгч компаниудын хариуцлагыг нэмэгдүүлэх (Penalty System) юм.
+        </p>
+
+        <h2>2. Technical Architecture</h2>
+        <p>Систем нь орчин үеийн, өргөтгөх боломжтой технологийн шийдлүүд дээр суурилсан.</p>
+
+        <div class="stat-box" style="margin-bottom: 20px;">
+            <h3>Frontend (Client Side)</h3>
+            <p>
+                <span class="tech-tag">Next.js 14</span>
+                <span class="tech-tag">React</span>
+                <span class="tech-tag">TypeScript</span>
+                <span class="tech-tag">TailwindCSS</span>
+                <span class="tech-tag">Framer Motion</span>
+            </p>
+            <p>Хэрэглэгчийн интерфэйс нь хурд, хариу үйлдэл үзүүлэх чадвар (responsiveness) болон SEO оновчлолд
+                зориулагдсан.</p>
+        </div>
+
+        <div class="stat-box" style="margin-bottom: 20px;">
+            <h3>Backend (Server Side)</h3>
+            <p>
+                <span class="tech-tag">Node.js</span>
+                <span class="tech-tag">Express</span>
+                <span class="tech-tag">Prisma ORM</span>
+                <span class="tech-tag">Zod Validation</span>
+                <span class="tech-tag">JWT Auth</span>
+            </p>
+            <p>Микросервис архитектур руу шилжих боломжтой модульчлагдсан бүтэцтэй. API нь RESTful стандартаар хийгдсэн.
+            </p>
+        </div>
+
+        <div class="stat-box">
+            <h3>Infrastructure & Data</h3>
+            <p>
+                <span class="tech-tag">PostgreSQL / SQLite</span>
+                <span class="tech-tag">Redis (Caching)</span>
+                <span class="tech-tag">Vercel / AWS</span>
+            </p>
+            <p>Өгөгдлийн сан нь бүрэн нормальчлагдсан (Normalized) бүтэцтэй бөгөөд гүйлгээний аюулгүй байдлыг (ACID
+                compliance) хангадаг.</p>
+        </div>
+    </div>
+
+    <!-- PAGE 3: CORE MODULES - LOGISTICS & MARKETPLACE -->
+    <div class="page">
+        <h1>3. Core Business Modules</h1>
+
+        <h2>3.1 Logistics & Tracking Engine</h2>
+        <p>Ачаа тээврийн үндсэн урсгал нь "Багц" (Batch) болон "Илгээмж" (Package) гэсэн хоёр үндсэн нэгж дээр
+            суурилдаг.</p>
+
+        <div class="diagram">
+            <span class="flow-step">Order Created</span>
+            <span class="arrow">➔</span>
+            <span class="flow-step">Warehouse Receive (CN)</span>
+            <span class="arrow">➔</span>
+            <span class="flow-step">Loading (Batching)</span>
+            <span class="arrow">➔</span>
+            <span class="flow-step">Transport (Transit)</span>
+            <span class="arrow">➔</span>
+            <span class="flow-step">Arrival (UB)</span>
+            <span class="arrow">➔</span>
+            <span class="flow-step">Distribution</span>
+        </div>
+
+        <h3>Key Features:</h3>
+        <ul>
+            <li><strong>Barcode Generation:</strong> Илгээмж бүр дахин давтагдашгүй QR/Barcode-той байна.</li>
+            <li><strong>Real-time Status:</strong> Хэрэглэгч ачаагаа хаана явж байгааг цаг тутам хянах боломжтой.</li>
+            <li><strong>Batch Management:</strong> Олон мянган жижиг илгээмжийг нэг "Batch"-д нэгтгэн тээвэрлэдэг.</li>
+        </ul>
+
+        <h2>3.2 Marketplace & Bidding</h2>
+        <p>Тээвэр зуучийн компаниуд болон захиалагчдыг холбох биржийн систем.</p>
+
+        <table>
+            <tr>
+                <th>Component</th>
+                <th>Functionality</th>
+            </tr>
+            <tr>
+                <td><strong>Job Listings</strong></td>
+                <td>Хэрэглэгч ачааны мэдээлэл (жин, төрөл, чиглэл) оруулж зар тавина.</td>
+            </tr>
+            <tr>
+                <td><strong>Bidding System</strong></td>
+                <td>Компаниуд үнийн санал (Bid) өгнө. Санал нь үнэ болон тээвэрлэх хугацааг агуулна.</td>
+            </tr>
+            <tr>
+                <td><strong>Selection</strong></td>
+                <td>Хэрэглэгч үнэлгээ, үнэ, хурд зэрэгт үндэслэн компани сонгоно.</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- PAGE 4: GOVERNANCE & FINANCE -->
+    <div class="page">
+        <h1>4. Governance & Financial Model</h1>
+
+        <h2>4.1 Penalty System (3-Strike Rule)</h2>
+        <p>Чанарын хяналтыг сайжруулах зорилгоор системд <strong>"Зөрчлийн оноо"</strong>-ны механизмыг нэвтрүүлсэн.</p>
+
+        <div class="stat-box" style="border-left: 4px solid #ef4444; background: #fef2f2;">
+            <h3>Logic Flow</h3>
+            <ol>
+                <li><strong>Violation Report:</strong> Админ зөрчлийг (ачаа дутсан, гомдол) бүртгэнэ.</li>
+                <li><strong>Strike Increment:</strong> Компанийн "Strike Count" нэгээр нэмэгдэнэ.</li>
+                <li><strong>Automatic Trigger:</strong> Хэрэв Strike Count == 3 болвол:
+                    <ul>
+                        <li>System Status -> <strong>SUSPENDED</strong></li>
+                        <li>IsActive -> <strong>FALSE</strong></li>
+                        <li>Marketplace Access -> <strong>REVOKED</strong></li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+        <p>Админ зөрчлийг шийдвэрлэсний (Resolve) дараа л компанийн эрх сэргэх боломжтой.</p>
+
+        <h2>4.2 Financial Settlement & Tax</h2>
+        <p>Төлбөр тооцоо нь "Wallet" системээр дамжиж хийгддэг бөгөөд татварын хуулийн дагуу НӨАТ (VAT) автоматаар
+            тооцогдоно.</p>
+
+        <h3>Commission Model Example:</h3>
+        <table>
+            <tr>
+                <th>Description</th>
+                <th>Rate / Value</th>
+                <th>Calculation</th>
+            </tr>
+            <tr>
+                <td>Total Shipping Fee</td>
+                <td>100.0%</td>
+                <td>100,000₮ (Example)</td>
+            </tr>
+            <tr>
+                <td><strong>VAT (НӨАТ)</strong></td>
+                <td>10.0%</td>
+                <td>- 9,091₮ (Sent to E-Barimt)</td>
+            </tr>
+            <tr>
+                <td><strong>City Tax (НХАТ)</strong></td>
+                <td>1.0%</td>
+                <td>- 909₮</td>
+            </tr>
+            <tr>
+                <td><strong>Platform Commission</strong></td>
+                <td>5.0%</td>
+                <td>- 5,000₮ (Zamex Revenue)</td>
+            </tr>
+            <tr>
+                <td><strong>Net Payout</strong></td>
+                <td>~84%</td>
+                <td>85,000₮ (To Partner Wallet)</td>
+            </tr>
+        </table>
+
+        <p style="margin-top: 1cm; font-size: 8pt; color: #94a3b8; text-align: center;">
+            This documentation reflects the system state as of February 14, 2026.<br>
+            All rights reserved @ Zamex Inc.
+        </p>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,1482 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model PlatformSettings {
+  id                         String    @id @default(uuid())
+  platformName               String    @default("zamex.app") @map("platform_name")
+  maintenanceMode            Boolean   @default(false) @map("maintenance_mode")
+  registrationOpen           Boolean   @default(true) @map("registration_open")
+  cnyRate                    Float     @default(485.0) @map("cny_rate")
+  defaultPlatformFeeRate     Float     @default(0.04) @map("default_platform_fee_rate")
+  minPlatformFee             Float     @default(200) @map("min_platform_fee")
+  maxPlatformFee             Float     @default(50000) @map("max_platform_fee")
+  qpayFeeRate                Float     @default(0.01) @map("qpay_fee_rate")
+  settlementCycleDays        Int       @default(7) @map("settlement_cycle_days")
+  storageFreedays            Int       @default(7) @map("storage_free_days")
+  storageFeePhase1           Float     @default(500) @map("storage_fee_phase1")
+  storageFeePhase2           Float     @default(1000) @map("storage_fee_phase2")
+  insuranceEnabled           Boolean   @default(true) @map("insurance_enabled")
+  insuranceBasicRate         Float     @default(0.03) @map("insurance_basic_rate")
+  insuranceBasicCoverage     Float     @default(0.50) @map("insurance_basic_coverage")
+  insuranceBasicMax          Float     @default(500000) @map("insurance_basic_max")
+  insuranceStandardRate      Float     @default(0.05) @map("insurance_standard_rate")
+  insuranceStandardCoverage  Float     @default(0.80) @map("insurance_standard_coverage")
+  insuranceStandardMax       Float     @default(2000000) @map("insurance_standard_max")
+  insurancePremiumRate       Float     @default(0.08) @map("insurance_premium_rate")
+  insurancePremiumCoverage   Float     @default(1.00) @map("insurance_premium_coverage")
+  insurancePremiumMax        Float     @default(10000000) @map("insurance_premium_max")
+  insuranceFundTarget        Float     @default(10000000) @map("insurance_fund_target")
+  maxCompensationNoInsurance Float     @default(100000) @map("max_compensation_no_insurance")
+  subscriptionEnabled        Boolean   @default(false) @map("subscription_enabled")
+  unidentifiedStorageDays    Int       @default(90) @map("unidentified_storage_days")
+  unidentifiedAutoMatchDays  Int       @default(45) @map("unidentified_auto_match_days")
+  ratingWeightOverall        Float     @default(0.40) @map("rating_weight_overall")
+  ratingWeightReturns        Float     @default(0.25) @map("rating_weight_returns")
+  ratingWeightSpeed          Float     @default(0.15) @map("rating_weight_speed")
+  ratingWeightResolution     Float     @default(0.10) @map("rating_weight_resolution")
+  ratingWeightSafety         Float     @default(0.10) @map("rating_weight_safety")
+  minRatingForListing        Float     @default(1.5) @map("min_rating_for_listing")
+  aiEnabled                  Boolean   @default(true) @map("ai_enabled")
+  aiMonthlyBudget            Float     @default(500) @map("ai_monthly_budget")
+  imongoliaEnabled           Boolean   @default(true) @map("imongolia_enabled")
+
+  // ═══ Feature Toggles (B & C) ═══
+  loyaltyEnabled             Boolean   @default(false) @map("loyalty_enabled")
+  referralEnabled            Boolean   @default(false) @map("referral_enabled")
+  deliveryPointsEnabled      Boolean   @default(false) @map("delivery_points_enabled")
+  qcServiceEnabled           Boolean   @default(true)  @map("qc_service_enabled") // Feature D is ON
+  qcPlatformShareRate        Float     @default(0.30)  @map("qc_platform_share_rate") // 30% to platform
+  qcTiers                    QcTier[]
+  
+  referralBonusMnt           Float     @default(5000)  @map("referral_bonus_mnt")
+  loyaltyPointRate           Float     @default(0.01)  @map("loyalty_point_rate") // 1% points
+  
+  // ═══ VAT (E-Barimt) Settings ═══
+  vatEnabled                 Boolean   @default(false) @map("vat_enabled")
+  vatRate                    Float     @default(0.10) @map("vat_rate") // 10%
+  ebarimtPosId               String?   @map("ebarimt_pos_id")
+  ebarimtMerchantId          String?   @map("ebarimt_merchant_id")
+  ebarimtApiUrl              String?   @default("http://localhost:8080") @map("ebarimt_api_url")
+  customsSystemEnabled       Boolean   @default(false) @map("customs_system_enabled")
+  autoPayoutEnabled          Boolean   @default(false) @map("auto_payout_enabled")
+  
+  // ═══ API Integrations ═══
+  qpayUsername               String?   @map("qpay_username")
+  qpayPassword               String?   @map("qpay_password")
+  qpayMerchantId             String?   @map("qpay_merchant_id")
+  openaiApiKey               String?   @map("openai_api_key")
+  geminiApiKey               String?   @map("gemini_api_key")
+  imongoliaClientId          String?   @map("imongolia_client_id")
+  imongoliaClientSecret      String?   @map("imongolia_client_secret")
+  smsApiUrl                  String?   @map("sms_api_url")
+  smsApiKey                  String?   @map("sms_api_key")
+  googleMapsApiKey           String?   @map("google_maps_api_key")
+  googleVisionApiKey         String?   @map("google_vision_api_key")
+  cloudinaryCloudName        String?   @map("cloudinary_cloud_name")
+  cloudinaryApiKey           String?   @map("cloudinary_api_key")
+  cloudinaryApiSecret        String?   @map("cloudinary_api_secret")
+
+  configPasswordHash         String    @map("config_password_hash")
+  lastModifiedBy             String?   @map("last_modified_by")
+  lastModifiedAt             DateTime? @map("last_modified_at")
+  createdAt                  DateTime  @default(now()) @map("created_at")
+  updatedAt                  DateTime  @updatedAt @map("updated_at")
+
+  @@map("platform_settings")
+}
+
+model PlatformSettingsHistory {
+  id        String   @id @default(uuid())
+  changedBy String   @map("changed_by")
+  fieldName String   @map("field_name")
+  oldValue  String?  @map("old_value")
+  newValue  String?  @map("new_value")
+  reason    String?
+  ipAddress String?  @map("ip_address")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("platform_settings_history")
+}
+
+model User {
+  id                  String               @id @default(uuid())
+  phone               String               @unique
+  email               String?              @unique
+  password            String
+  firstName           String               @map("first_name")
+  lastName            String?              @map("last_name")
+  role                UserRole             @default(CUSTOMER)
+  avatarUrl           String?              @map("avatar_url")
+  isActive            Boolean              @default(true) @map("is_active")
+  lastLogin           DateTime?            @map("last_login")
+  otpCode             String?              @map("otp_code")
+  otpExpiresAt        DateTime?            @map("otp_expires_at")
+  otpRetryCount       Int                  @default(0) @map("otp_retry_count")
+  otpLockedUntil      DateTime?            @map("otp_locked_until")
+  otpVerified         Boolean              @default(false) @map("otp_verified")
+  companyId           String?              @map("company_id")
+  roleTemplateId      String?              @map("role_template_id")
+  isVerified          Boolean              @default(false) @map("is_verified")
+  verificationStatus  VerificationStatus   @default(NOT_SUBMITTED) @map("verification_status")
+  language            Language             @default(MN)
+  
+  // ═══ Growth & UX (A & B) ═══
+  referralCode        String?              @unique @map("refer_code")
+  referredById        String?              @map("referred_by_id")
+  loyaltyPoints       Float                @default(0) @map("loyalty_points")
+  isConsolidationHold Boolean              @default(false) @map("is_consolidation_hold")
+
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  activityLogs        ActivityLog[]
+  assignedBatches     Batch[]              @relation("driverBatches")
+  chatMessages        ChatMessage[]
+  customerCompanies   CustomerCompany[]
+  invoices            Invoice[]
+  marketplaceListings MarketplaceListing[]
+  marketplaceBids     MarketplaceBid[]
+  notifications       Notification[]
+  orders              Order[]
+  requestedFinancialChanges FinancialChangeRequest[] @relation("financialRequester")
+  reviewedFinancialChanges  FinancialChangeRequest[] @relation("financialReviewer")
+  packages            Package[]            @relation("registeredBy")
+  ratings             Rating[]
+  refreshTokens       RefreshToken[]
+  returnRequests      ReturnRequest[]
+  company             Company?             @relation(fields: [companyId], references: [id])
+  roleTemplate        RoleTemplate?        @relation(fields: [roleTemplateId], references: [id])
+  vehicles            Vehicle[]
+  
+  referredBy          User?                @relation("UserReferral", fields: [referredById], references: [id])
+  referrals           User[]               @relation("UserReferral")
+  issuedPenalties     Penalty[]
+
+  @@map("users")
+}
+
+model RoleTemplate {
+  id          String   @id @default(uuid())
+  companyId   String   @map("company_id")
+  name        String
+  permissions Json     // Array of strings: ["can_scan", "can_measure", etc.]
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  users       User[]
+
+  @@unique([companyId, name])
+  @@map("role_templates")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model Company {
+  id                  String                 @id @default(uuid())
+  name                String
+  nameEn              String?                @map("name_en")
+  slug                String                 @unique
+  logoUrl             String?                @map("logo_url")
+  phone               String?
+  email               String?
+  description         String?
+  codePrefix          String                 @unique @map("code_prefix")
+  isActive            Boolean                @default(true) @map("is_active")
+  status              CompanyStatus          @default(PENDING) // PENDING, VERIFIED, REJECTED, SUSPENDED
+  strikeCount         Int                    @default(0) @map("strike_count") // Number of penalties/warnings
+  type                CompanyType            @default(BOTH)
+  cargoType           CargoType?             @default(ERLIAN_UB) @map("cargo_type")
+  isVerified          Boolean                @default(false) @map("is_verified")
+  verificationStatus  VerificationStatus     @default(NOT_SUBMITTED) @map("verification_status")
+  createdAt           DateTime               @default(now()) @map("created_at")
+  updatedAt           DateTime               @updatedAt @map("updated_at")
+  activityLogs        ActivityLog[]
+  paymentAccounts     CompanyPaymentAccount[]
+
+  // Deprecated flat fields (kept for migration buffer if needed, but moving to collection)
+  bankNameMn          String?                @map("bank_name_mn")
+  bankAccountMn       String?                @map("bank_account_mn")
+  bankAccountNameMn   String?                @map("bank_account_name_mn")
+  wechatId            String?                @map("wechat_id")
+  alipayId            String?                @map("alipay_id")
+  wechatQrUrl         String?                @map("wechat_qr_url")
+  alipayQrUrl         String?                @map("alipay_qr_url")
+  carrierBatches      Batch[]                @relation("carrierBatches")
+  batches             Batch[]                @relation("companyBatches")
+  categories          Category[]
+  ratingsSummary      CompanyRatingsSummary?
+  customerCompanies   CustomerCompany[]
+  invoices            Invoice[]
+  marketplaceListings MarketplaceListing[]
+  marketplaceBids     MarketplaceBid[]
+  orders              Order[]
+  packages            Package[]
+  pricingRules        PricingRule[]
+  ratings             Rating[]
+  returnRequests      ReturnRequest[]
+  settlements         Settlement[]
+  unidentifiedPkgs    UnidentifiedPackage[]
+  staff               User[]
+  roleTemplates       RoleTemplate[]
+  warehouses          Warehouse[]
+  workflowSettings    WorkflowSettings?
+  specializations     Specialization[]       @relation("CompanyToSpecialization")
+  storePackages       Package[]              @relation("storePackages")
+  apiKeys             CompanyApiKey[]
+  carrierFees         PlatformFee[]          @relation("carrierFees")
+  carrierSettlements  Settlement[]           @relation("carrierSettlements")
+  deliveryPoints      DeliveryPoint[]
+  financialRequests   FinancialChangeRequest[]
+  penalties           Penalty[]
+
+  @@map("companies")
+}
+
+model CustomerCompany {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  companyId    String   @map("company_id")
+  customerCode String   @map("customer_code")
+  isPrimary    Boolean  @default(false) @map("is_primary")
+  joinedAt     DateTime @default(now()) @map("joined_at")
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, companyId])
+  @@unique([companyId, customerCode])
+  @@map("customer_companies")
+}
+
+model WorkflowSettings {
+  id                        String      @id @default(uuid())
+  companyId                 String      @unique @map("company_id")
+  preAnnounceRequired       Boolean     @default(false) @map("pre_announce_required")
+  photoOnReceiveRequired    Boolean     @default(true) @map("photo_on_receive_required")
+  categorizationRequired    Boolean     @default(false) @map("categorization_required")
+  aiAutoCategorize          Boolean     @default(true) @map("ai_auto_categorize")
+  measureDimensionsRequired Boolean     @default(false) @map("measure_dimensions_required")
+  customsMode               CustomsMode @default(ABSORBED) @map("customs_mode")
+  customsThresholdValue     Float?      @map("customs_threshold_value")
+  customsSeparateCategories Json        @default("[]") @map("customs_separate_categories")
+  gpsTrackingEnabled        Boolean     @default(true) @map("gps_tracking_enabled")
+  gpsUpdateIntervalSeconds  Int         @default(30) @map("gps_update_interval_seconds")
+  shelfAssignmentRequired   Boolean     @default(false) @map("shelf_assignment_required")
+  insuranceAutoSuggest      Boolean     @default(false) @map("insurance_auto_suggest")
+  insuranceSuggestThreshold Float       @default(500000) @map("insurance_suggest_threshold")
+  deliveryEnabled           Boolean     @default(false) @map("delivery_enabled")
+  selfPickupOnly            Boolean     @default(true) @map("self_pickup_only")
+  notifyOnReceive           Boolean     @default(true) @map("notify_on_receive")
+  notifyOnDepart            Boolean     @default(true) @map("notify_on_depart")
+  notifyOnArrive            Boolean     @default(true) @map("notify_on_arrive")
+  notifyOnReady             Boolean     @default(true) @map("notify_on_ready")
+  notifyOnInvoice           Boolean     @default(true) @map("notify_on_invoice")
+  aiChatbotEnabled          Boolean     @default(true) @map("ai_chatbot_enabled")
+  aiLabelScanEnabled        Boolean     @default(true) @map("ai_label_scan_enabled")
+  aiTranslationEnabled      Boolean     @default(true) @map("ai_translation_enabled")
+  createdAt                 DateTime    @default(now()) @map("created_at")
+  updatedAt                 DateTime    @updatedAt @map("updated_at")
+  company                   Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("workflow_settings")
+}
+
+model CompanyApiKey {
+  id          String   @id @default(uuid())
+  companyId   String   @map("company_id")
+  name        String   // e.g., "Shopify Integration"
+  keyHash     String   @unique @map("key_hash")
+  keyPrefix   String   @map("key_prefix") // zx_...
+  scopes      Json?    // ["read:packages", "create:packages"]
+  lastUsedAt  DateTime? @map("last_used_at")
+  expiresAt   DateTime? @map("expires_at")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@map("company_api_keys")
+}
+
+model Warehouse {
+  id           String        @id @default(uuid())
+  companyId    String        @map("company_id")
+  type         WarehouseType
+  name         String
+  address      String
+  city         String
+  phone        String?
+  receiverName String?       @map("receiver_name")
+  isActive     Boolean       @default(true) @map("is_active")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  packages            Package[]      @relation("packageCurrentWarehouse")
+  destiningPackages   Package[]      @relation("packageDestination")
+  originBatches       Batch[]        @relation("batchOrigin")
+  destinationBatches  Batch[]        @relation("batchDestination")
+  company             Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("warehouses")
+}
+
+model Category {
+  id           String        @id @default(uuid())
+  companyId    String?       @map("company_id")
+  name         String
+  nameCn       String?       @map("name_cn")
+  slug         String
+  icon         String?
+  isGlobal     Boolean       @default(false) @map("is_global")
+  isActive     Boolean       @default(true) @map("is_active")
+  hsCodeId     String?       @map("hs_code_id")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  hsCode       HsCode?       @relation(fields: [hsCodeId], references: [id])
+  company      Company?      @relation(fields: [companyId], references: [id])
+  packages     Package[]
+  pricingRules PricingRule[]
+
+  @@unique([companyId, slug])
+  @@map("categories")
+}
+
+model PricingRule {
+  id          String           @id @default(uuid())
+  companyId   String           @map("company_id")
+  categoryId  String?          @map("category_id")
+  name        String
+  ruleType    PricingRuleType  @default(WEIGHT_VOLUME) @map("rule_type")
+  pricePerKg  Float?           @map("price_per_kg")
+  pricePerCbm Float?           @map("price_per_cbm")
+  fixedPrice  Float?           @map("fixed_price")
+  currency    String           @default("CNY")
+  minAmount   Float?           @map("min_amount")
+  serviceType CargoServiceType @default(STANDARD) @map("service_type")
+  isDefault   Boolean          @default(false) @map("is_default")
+  isActive    Boolean          @default(true) @map("is_active")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+  category    Category?        @relation(fields: [categoryId], references: [id])
+  company     Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  packages    Package[]
+
+  @@map("pricing_rules")
+}
+
+enum PricingRuleType {
+  WEIGHT_VOLUME  // Жин болон овор хэмжээгээр
+  FIXED          // Ширхэгийн тогтмол үнээр
+  CATEGORY_BASED // Ангилалаар (Эмзэг, тусгай г.м)
+}
+
+model Order {
+  id                   String             @id @default(uuid())
+  companyId            String             @map("company_id")
+  customerId           String             @map("customer_id")
+  orderCode            String             @unique @map("order_code")
+  productUrl           String?            @map("product_url")
+  productPlatform      String?            @map("product_platform")
+  productTitle         String?            @map("product_title")
+  productImages        Json               @default("[]") @map("product_images")
+  productScreenshot    String?            @map("product_screenshot_url")
+  productPrice         Float?             @map("product_price")
+  productPriceCurrency String             @default("CNY") @map("product_price_currency")
+  productQuantity      Int                @default(1) @map("product_quantity")
+  productDescription   String?            @map("product_description")
+  trackingNumber       String?            @map("tracking_number")
+  carrier              String?
+  shippingAddress      Json               @map("shipping_address")
+  insurancePlanSlug    InsurancePlanSlug? @map("insurance_plan_slug")
+  serviceType          CargoServiceType  @default(STANDARD) @map("service_type")
+  
+  // ═══ New Features (A, C, D) ═══
+  isHold               Boolean           @default(false) @map("is_hold")
+  qcRequested          Boolean           @default(false) @map("qc_requested")
+  qcStatus             QcStatus          @default(NOT_REQUESTED) @map("qc_status")
+  qcTierId             String?           @map("qc_tier_id")
+  qcServiceFee         Float?            @map("qc_service_fee") // Captured at time of request
+  qcVatAmount          Float?            @map("qc_vat_amount")
+  qcPlatformFee        Float?            @map("qc_platform_fee")
+  qcCargoRevenue       Float?            @map("qc_cargo_revenue")
+  qcPaidAt             DateTime?         @map("qc_paid_at")
+  qcPaymentId          String?           @map("qc_payment_id") // QPay invoice/transaction ID
+  deliveryPointId      String?           @map("delivery_point_id")
+  
+  qcTier               QcTier?           @relation(fields: [qcTierId], references: [id])
+  
+  status               OrderStatus        @default(PENDING)
+  matchedAt            DateTime?          @map("matched_at")
+  packageId            String?            @unique @map("package_id")
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
+  notReceivedClaims    NotReceivedClaim[]
+  package              Package?           @relation(fields: [packageId], references: [id])
+  customer             User               @relation(fields: [customerId], references: [id])
+  company              Company            @relation(fields: [companyId], references: [id])
+  insurance            PackageInsurance?
+  rating               Rating?
+  returnRequests       ReturnRequest[]
+  deliveryPoint        DeliveryPoint?      @relation(fields: [deliveryPointId], references: [id])
+
+  @@index([companyId])
+  @@index([customerId])
+  @@index([trackingNumber])
+  @@index([status])
+  @@map("orders")
+}
+
+model Package {
+  id                String          @id @default(uuid())
+  companyId         String          @map("company_id")
+  customerId        String?         @map("customer_id")
+  trackingNumber    String?         @map("tracking_number")
+  description       String?
+  weightKg          Float?          @map("weight_kg")
+  lengthCm          Float?          @map("length_cm")
+  widthCm           Float?          @map("width_cm")
+  heightCm          Float?          @map("height_cm")
+  cbm               Float?
+  categoryId        String?         @map("category_id")
+  labelPhotoUrl     String?         @map("label_photo_url")
+  packagePhotos     Json            @default("[]") @map("package_photos")
+  warehouseId       String?         @map("warehouse_id")
+  destinationId     String?         @map("destination_id")
+  shelfLocation     String?         @map("shelf_location")
+  batchId           String?         @map("batch_id")
+  status            PackageStatus    @default(RECEIVED_ORIGIN)
+  serviceType       CargoServiceType @default(STANDARD) @map("service_type")
+  zamexLabelPrinted Boolean          @default(false) @map("zamex_label_printed")
+  shippingCost      Float?          @map("shipping_cost")
+  receivedAt        DateTime?       @map("received_at")
+  measuredAt        DateTime?       @map("measured_at")
+  departedAt        DateTime?       @map("departed_at")
+  arrivedAt         DateTime?       @map("arrived_at")
+  deliveredAt       DateTime?       @map("delivered_at")
+  registeredById    String?         @map("registered_by_id")
+  pricingRuleId     String?         @map("pricing_rule_id")
+  priceCny          Float?          @map("price_cny")
+  exchangeRate      Float?          @map("exchange_rate")
+  sourceStoreId     String?         @map("source_store_id")
+  
+  // ═══ QC Report (D) ═══
+  qcReportUrl       String?         @map("qc_report_url")
+  qcNotes           String?         @map("qc_notes")
+  qcPhotos          Json            @default("[]") @map("qc_photos")
+  qcCompleted       Boolean         @default(false) @map("qc_completed")
+  qcStaffId         String?         @map("qc_staff_id")
+
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+  invoiceItems      InvoiceItem[]
+  order             Order?
+  customs           PackageCustoms?
+  batch             Batch?          @relation(fields: [batchId], references: [id])
+  warehouse         Warehouse?      @relation("packageCurrentWarehouse", fields: [warehouseId], references: [id])
+  destination       Warehouse?      @relation("packageDestination", fields: [destinationId], references: [id])
+  category          Category?       @relation(fields: [categoryId], references: [id])
+  customer          User?           @relation("registeredBy", fields: [customerId], references: [id])
+  company           Company         @relation(fields: [companyId], references: [id])
+  sourceStore       Company?        @relation("storePackages", fields: [sourceStoreId], references: [id])
+  pricingRule       PricingRule?    @relation(fields: [pricingRuleId], references: [id])
+  
+  // Condition assessment
+  condition         PackageCondition @default(INTACT)
+  conditionNote     String?          @map("condition_note")
+
+  // Consolidation / Bundling
+  isBundle          Boolean         @default(false) @map("is_bundle")
+  parentId          String?         @map("parent_package_id")
+  parentPackage     Package?        @relation("packageBundling", fields: [parentId], references: [id])
+  childPackages     Package[]       @relation("packageBundling")
+
+  @@index([companyId])
+  @@index([trackingNumber])
+  @@index([status])
+  @@index([batchId])
+  @@map("packages")
+}
+
+model UnidentifiedPackage {
+  id               String             @id @default(uuid())
+  companyId        String             @map("company_id")
+  tempCode         String             @unique @map("temp_code")
+  partialTracking  String?            @map("partial_tracking")
+  partialPhone     String?            @map("partial_phone")
+  partialName      String?            @map("partial_name")
+  labelPhotoUrl    String             @map("label_photo_url")
+  packagePhotos    Json               @default("[]") @map("package_photos")
+  weightKg         Float?             @map("weight_kg")
+  productType      String?            @map("product_type")
+  shelfLocation    String?            @map("shelf_location")
+  staffNotes       String?            @map("staff_notes")
+  registeredBy     String?            @map("registered_by")
+  aiDescription    String?            @map("ai_description")
+  aiCategory       String?            @map("ai_category")
+  status           UnidentifiedStatus @default(STORED)
+  storedAt         DateTime           @default(now()) @map("stored_at")
+  expiresAt        DateTime?          @map("expires_at")
+  matchedAt        DateTime?          @map("matched_at")
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+  matchSuggestions MatchSuggestion[]
+  company          Company            @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
+  @@index([status])
+  @@map("unidentified_packages")
+}
+
+model NotReceivedClaim {
+  id             String    @id @default(uuid())
+  orderId        String    @map("order_id")
+  customerId     String    @map("customer_id")
+  companyId      String    @map("company_id")
+  chinaTracking  String?   @map("china_tracking")
+  orderedDate    DateTime? @map("ordered_date")
+  evidencePhotos Json      @default("[]") @map("evidence_photos")
+  notes          String?
+  status         String    @default("OPEN")
+  reviewedBy     String?   @map("reviewed_by")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  order          Order     @relation(fields: [orderId], references: [id])
+
+  @@index([companyId])
+  @@index([status])
+  @@map("not_received_claims")
+}
+
+model MatchSuggestion {
+  id             String              @id @default(uuid())
+  companyId      String              @map("company_id")
+  orderId        String?             @map("order_id")
+  unidentifiedId String              @map("unidentified_id")
+  confidence     Int
+  reasoning      String?
+  matchedFields  Json?               @map("matched_fields")
+  status         String              @default("PENDING")
+  decidedBy      String?             @map("decided_by")
+  createdAt      DateTime            @default(now()) @map("created_at")
+  unidentified   UnidentifiedPackage @relation(fields: [unidentifiedId], references: [id])
+
+  @@map("match_suggestions")
+}
+
+model Batch {
+  id            String        @id @default(uuid())
+  batchCode     String        @unique @map("batch_code")
+  status        BatchStatus      @default(OPEN)
+  serviceType   CargoServiceType @default(STANDARD) @map("service_type")
+  companyId     String           @map("company_id")
+  carrierId     String?       @map("carrier_id")
+  driverId      String?       @map("driver_id")
+  vehicleId     String?       @map("vehicle_id")
+  vehiclePlate  String?       @map("vehicle_plate")
+  vehicleModel  String?       @map("vehicle_model")
+  vehicleType   String?       @map("vehicle_type")
+  totalPackages Int           @default(0) @map("total_packages")
+  totalWeight   Float         @default(0) @map("total_weight")
+  departedAt    DateTime?     @map("departed_at")
+  arrivedAt     DateTime?     @map("arrived_at")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  manifestToken String?       @unique @map("manifest_token")
+  originId      String?       @map("origin_id")
+  destinationId String?       @map("destination_id")
+  vehicle       Vehicle?      @relation(fields: [vehicleId], references: [id])
+  driver        User?         @relation("driverBatches", fields: [driverId], references: [id])
+  carrier       Company?      @relation("carrierBatches", fields: [carrierId], references: [id])
+  company       Company       @relation("companyBatches", fields: [companyId], references: [id])
+  origin        Warehouse?    @relation("batchOrigin", fields: [originId], references: [id])
+  destination   Warehouse?    @relation("batchDestination", fields: [destinationId], references: [id])
+  sourceBid     MarketplaceBid? @relation(fields: [sourceBidId], references: [id])
+  sourceBidId   String?       @map("source_bid_id")
+  gpsLogs       GpsTracking[]
+  packages      Package[]
+
+  @@index([companyId])
+  @@index([status])
+  @@map("batches")
+}
+
+model GpsTracking {
+  id        String   @id @default(uuid())
+  batchId   String   @map("batch_id")
+  latitude  Float
+  longitude Float
+  speed     Float?
+  heading   Float?
+  createdAt DateTime @default(now()) @map("created_at")
+  batch     Batch    @relation(fields: [batchId], references: [id])
+
+  @@index([batchId, createdAt])
+  @@map("gps_tracking")
+}
+
+model HsCode {
+  id         String     @id @default(uuid())
+  code       String     @unique
+  nameMn     String?    @map("name_mn")
+  nameCn     String?    @map("name_cn")
+  nameEn     String?    @map("name_en")
+  dutyRate   Float      @default(5.00) @map("duty_rate")
+  vatRate    Float      @default(10.00) @map("vat_rate")
+  exciseRate Float      @default(0) @map("excise_rate")
+  isExempt   Boolean    @default(false) @map("is_exempt")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+  categories Category[]
+
+  @@map("hs_codes")
+}
+
+model PackageCustoms {
+  id                   String      @id @default(uuid())
+  packageId            String      @unique @map("package_id")
+  hsCode               String?     @map("hs_code")
+  declaredValue        Float?      @map("declared_value")
+  exchangeRate         Float?      @map("exchange_rate")
+  dutyAmount           Float       @default(0) @map("duty_amount")
+  vatAmount            Float       @default(0) @map("vat_amount")
+  totalCustomsFee      Float       @default(0) @map("total_customs_fee")
+  customsMode          CustomsMode @default(ABSORBED) @map("customs_mode")
+  isIncludedInShipping Boolean     @default(true) @map("is_included_in_shipping")
+  declarationStatus    String      @default("not_required") @map("declaration_status")
+  createdAt            DateTime    @default(now()) @map("created_at")
+  updatedAt            DateTime    @updatedAt @map("updated_at")
+  package              Package     @relation(fields: [packageId], references: [id], onDelete: Cascade)
+
+  @@map("package_customs")
+}
+
+model Invoice {
+  id              String            @id @default(uuid())
+  companyId       String            @map("company_id")
+  customerId      String            @map("customer_id")
+  invoiceCode     String            @unique @map("invoice_code")
+  status          InvoiceStatus     @default(DRAFT)
+  shippingAmount  Float             @default(0) @map("shipping_amount")
+  insuranceAmount Float             @default(0) @map("insurance_amount")
+  customsAmount   Float             @default(0) @map("customs_amount")
+  storageAmount   Float             @default(0) @map("storage_amount")
+  vatAmount       Float             @default(0) @map("vat_amount")
+  totalAmount     Float             @default(0) @map("total_amount")
+  paidAt          DateTime?         @map("paid_at")
+  paymentMethod   String?           @map("payment_method")
+  dueDate         DateTime?         @map("due_date")
+  pickupQrCode    String?           @map("pickup_qr_code")
+  
+  // E-barimt fields
+  ebarimtLottery  String?           @map("ebarimt_lottery")
+  ebarimtQrData   String?           @map("ebarimt_qr_data")
+  ebarimtBillId   String?           @map("ebarimt_bill_id")
+  ebarimtStatus   String?           @map("ebarimt_status") // SUCCESS, FAILED, REVOKED
+  ebarimtType     String?           @default("1") @map("ebarimt_type") // 1: individual, 3: organization
+  ebarimtRegNo    String?           @map("ebarimt_reg_no") // Organization registry number
+  
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  items           InvoiceItem[]
+  customer        User              @relation(fields: [customerId], references: [id])
+  company         Company           @relation(fields: [companyId], references: [id])
+  platformFee     PlatformFee?
+  qpayTxns        QpayTransaction[]
+
+  @@index([companyId])
+  @@index([customerId])
+  @@index([status])
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id          String   @id @default(uuid())
+  invoiceId   String   @map("invoice_id")
+  packageId   String?  @map("package_id")
+  description String
+  quantity    Int      @default(1)
+  unitPrice   Float    @map("unit_price")
+  vatAmount   Float    @default(0) @map("vat_amount")
+  amount      Float
+  itemType    String   @map("item_type")
+  createdAt   DateTime @default(now()) @map("created_at")
+  package     Package? @relation(fields: [packageId], references: [id])
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@map("invoice_items")
+}
+
+model QpayTransaction {
+  id            String    @id @default(uuid())
+  invoiceId     String    @map("invoice_id")
+  qpayInvoiceId String?   @map("qpay_invoice_id")
+  qpayQrCode    String?   @map("qpay_qr_code")
+  qpayUrl       String?   @map("qpay_url")
+  amount        Float
+  status        String    @default("PENDING")
+  paidAt        DateTime? @map("paid_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  invoice       Invoice   @relation(fields: [invoiceId], references: [id])
+
+  @@map("qpay_transactions")
+}
+
+model PlatformFee {
+  id             String   @id @default(uuid())
+  invoiceId      String   @unique @map("invoice_id")
+  companyId      String   @map("company_id")
+  carrierId      String?  @map("carrier_id")
+  shippingAmount Float    @map("shipping_amount")
+  feeRate        Float    @map("fee_rate")
+  feeAmount      Float    @map("fee_amount")
+  vatAmount      Float    @default(0) @map("vat_amount")
+  qpayFee        Float    @map("qpay_fee")
+  carrierAmount  Float    @default(0) @map("carrier_amount")
+  netToCargo     Float    @map("net_to_cargo")
+  createdAt      DateTime @default(now()) @map("created_at")
+  invoice        Invoice  @relation(fields: [invoiceId], references: [id])
+  carrier        Company? @relation("carrierFees", fields: [carrierId], references: [id])
+
+  @@map("platform_fees")
+}
+
+model Settlement {
+  id                   String    @id @default(uuid())
+  companyId            String    @map("company_id")
+  carrierId            String?   @map("carrier_id")
+  periodStart          DateTime  @map("period_start")
+  periodEnd            DateTime  @map("period_end")
+  totalShippingRevenue Float     @map("total_shipping_revenue")
+  totalPlatformFees    Float     @map("total_platform_fees")
+  totalQpayFees        Float     @map("total_qpay_fees")
+  totalRefunds         Float     @map("total_refunds")
+  carrierAmount        Float     @default(0) @map("carrier_amount")
+  originalAmount       Float?    @map("original_amount")
+  adjustmentAmount     Float?    @default(0) @map("adjustment_amount")
+  adjustmentNote       String?   @map("adjustment_note")
+  hubApprovalStatus    String    @default("PENDING") @map("hub_approval_status") // PENDING, APPROVED, ADJUSTED
+  carrierApprovalStatus String   @default("PENDING") @map("carrier_approval_status") // PENDING, ACCEPTED, REJECTED
+  
+  netAmount            Float     @map("net_amount")
+  bankName             String?   @map("bank_name")
+  bankAccount          String?   @map("bank_account")
+  transferReference    String?   @map("transfer_reference")
+  status               String    @default("PENDING") // PENDING, HUB_APPROVED, CARRIER_ACCEPTED, COMPLETED, DISPUTED
+  transferredAt        DateTime? @map("transferred_at")
+  transferReceiptUrl   String?   @map("transfer_receipt_url")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  company              Company   @relation(fields: [companyId], references: [id])
+  carrier              Company?  @relation("carrierSettlements", fields: [carrierId], references: [id])
+
+  @@index([companyId])
+  @@index([carrierId])
+  @@map("settlements")
+}
+
+model ExchangeRate {
+  id           String   @id @default(uuid())
+  fromCurrency String   @map("from_currency")
+  toCurrency   String   @map("to_currency")
+  rate         Float
+  source       String?
+  effectiveAt  DateTime @map("effective_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([fromCurrency, toCurrency, effectiveAt])
+  @@map("exchange_rates")
+}
+
+model CompanyPaymentAccount {
+  id              String             @id @default(uuid())
+  companyId       String             @map("company_id")
+  type            PaymentAccountType
+  providerName    String?            @map("provider_name") // e.g. Khan Bank, WeChat
+  accountNumber   String?            @map("account_number")
+  accountName     String?            @map("account_name")
+  identifier      String?            // e.g. WeChat ID
+  qrUrl           String?            @map("qr_url")
+  isDefault       Boolean            @default(false) @map("is_default")
+  isActive        Boolean            @default(true) @map("is_active")
+  verificationStatus VerificationStatus @default(APPROVED) @map("verification_status")
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+  company         Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@map("company_payment_accounts")
+}
+
+model FinancialChangeRequest {
+  id              String             @id @default(uuid())
+  companyId       String             @map("company_id")
+  entityType      String             @default("PAYMENT_ACCOUNT") @map("entity_type")
+  entityId        String?            @map("entity_id") // ID of account being updated/deleted
+  changeType      FinancialChangeType @map("change_type")
+  requestedData   Json               @map("requested_data")
+  status          VerificationStatus @default(PENDING)
+  rejectionReason String?            @map("rejection_reason")
+  requesterId     String             @map("requester_id")
+  reviewerId      String?            @map("reviewer_id")
+  reviewedAt      DateTime?          @map("reviewed_at")
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+
+  company         Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  requester       User               @relation("financialRequester", fields: [requesterId], references: [id])
+  reviewer        User?              @relation("financialReviewer", fields: [reviewerId], references: [id])
+
+  @@index([companyId])
+  @@map("financial_change_requests")
+}
+
+enum FinancialChangeType {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+enum PaymentAccountType {
+  BANK_MN
+  WECHAT
+  ALIPAY
+  BANK_CN
+  OTHER
+}
+
+model PackageInsurance {
+  id               String            @id @default(uuid())
+  orderId          String            @unique @map("order_id")
+  planSlug         InsurancePlanSlug @map("plan_slug")
+  declaredValue    Float             @map("declared_value")
+  declaredCurrency String            @default("CNY") @map("declared_currency")
+  declaredValueMnt Float             @map("declared_value_mnt")
+  premium          Float
+  maxPayout        Float             @map("max_payout")
+  coverageRate     Float             @map("coverage_rate")
+  status           InsuranceStatus   @default(ACTIVE)
+  expiresAt        DateTime?         @map("expires_at")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  claims           InsuranceClaim[]
+  order            Order             @relation(fields: [orderId], references: [id])
+
+  @@map("package_insurance")
+}
+
+model InsuranceClaim {
+  id             String           @id @default(uuid())
+  insuranceId    String           @map("insurance_id")
+  returnId       String?          @map("return_id")
+  claimType      String           @map("claim_type")
+  description    String?
+  claimedAmount  Float?           @map("claimed_amount")
+  approvedAmount Float?           @map("approved_amount")
+  status         String           @default("PENDING")
+  reviewedBy     String?          @map("reviewed_by")
+  reviewedAt     DateTime?        @map("reviewed_at")
+  paid           Boolean          @default(false)
+  paidAt         DateTime?        @map("paid_at")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  insurance      PackageInsurance @relation(fields: [insuranceId], references: [id])
+
+  @@map("insurance_claims")
+}
+
+model InsuranceFundTransaction {
+  id              String   @id @default(uuid())
+  transactionType String   @map("transaction_type")
+  amount          Float
+  balance         Float
+  referenceId     String?  @map("reference_id")
+  referenceType   String?  @map("reference_type")
+  description     String?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("insurance_fund_transactions")
+}
+
+model ReturnRequest {
+  id               String              @id @default(uuid())
+  companyId        String              @map("company_id")
+  customerId       String              @map("customer_id")
+  orderId          String?             @map("order_id")
+  returnCode       String              @unique @map("return_code")
+  returnType       ReturnType          @map("return_type")
+  title            String
+  description      String
+  evidencePhotos   Json                @default("[]") @map("evidence_photos")
+  liableParty      LiableParty         @default(UNDETERMINED) @map("liable_party")
+  liabilityReason  String?             @map("liability_reason")
+  requestedAmount  Float?              @map("requested_amount")
+  approvedAmount   Float?              @map("approved_amount")
+  systemEvidence   Json?               @map("system_evidence")
+  status           ReturnStatus        @default(OPENED)
+  reviewedBy       String?             @map("reviewed_by")
+  reviewedAt       DateTime?           @map("reviewed_at")
+  customerAccepted Boolean?            @map("customer_accepted")
+  isAppealed       Boolean             @default(false) @map("is_appealed")
+  createdAt        DateTime            @default(now()) @map("created_at")
+  updatedAt        DateTime            @updatedAt @map("updated_at")
+  refundTxns       RefundTransaction[]
+  order            Order?              @relation(fields: [orderId], references: [id])
+  customer         User                @relation(fields: [customerId], references: [id])
+  company          Company             @relation(fields: [companyId], references: [id])
+  timeline         ReturnTimeline[]
+
+  @@index([companyId])
+  @@index([status])
+  @@map("return_requests")
+}
+
+model ReturnTimeline {
+  id        String        @id @default(uuid())
+  returnId  String        @map("return_id")
+  action    String
+  actorId   String?       @map("actor_id")
+  actorRole String?       @map("actor_role")
+  message   String?
+  oldStatus String?       @map("old_status")
+  newStatus String?       @map("new_status")
+  createdAt DateTime      @default(now()) @map("created_at")
+  request   ReturnRequest @relation(fields: [returnId], references: [id], onDelete: Cascade)
+
+  @@map("return_timeline")
+}
+
+model RefundTransaction {
+  id              String        @id @default(uuid())
+  returnId        String        @map("return_id")
+  amount          Float
+  shippingRefund  Float         @default(0) @map("shipping_refund")
+  customsRefund   Float         @default(0) @map("customs_refund")
+  insurancePayout Float         @default(0) @map("insurance_payout")
+  compensation    Float         @default(0)
+  refundMethod    String?       @map("refund_method")
+  chargedTo       LiableParty?  @map("charged_to")
+  status          String        @default("PENDING")
+  processedAt     DateTime?     @map("processed_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  request         ReturnRequest @relation(fields: [returnId], references: [id])
+
+  @@map("refund_transactions")
+}
+
+model Rating {
+  id                  String    @id @default(uuid())
+  companyId           String    @map("company_id")
+  customerId          String    @map("customer_id")
+  orderId             String?   @unique @map("order_id")
+  overallRating       Int       @map("overall_rating")
+  speedRating         Int?      @map("speed_rating")
+  safetyRating        Int?      @map("safety_rating")
+  serviceRating       Int?      @map("service_rating")
+  priceRating         Int?      @map("price_rating")
+  communicationRating Int?      @map("communication_rating")
+  comment             String?
+  tags                Json      @default("[]")
+  companyResponse     String?   @map("company_response")
+  companyRespondedAt  DateTime? @map("company_responded_at")
+  hadReturnRequest    Boolean   @default(false) @map("had_return_request")
+  isVisible           Boolean   @default(true) @map("is_visible")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+  order               Order?    @relation(fields: [orderId], references: [id])
+  customer            User      @relation(fields: [customerId], references: [id])
+  company             Company   @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
+  @@map("ratings")
+}
+
+model CompanyRatingsSummary {
+  id               String   @id @default(uuid())
+  companyId        String   @unique @map("company_id")
+  totalRatings     Int      @default(0) @map("total_ratings")
+  averageRating    Float    @default(0) @map("average_rating")
+  avgSpeed         Float    @default(0) @map("avg_speed")
+  avgSafety        Float    @default(0) @map("avg_safety")
+  avgService       Float    @default(0) @map("avg_service")
+  avgPrice         Float    @default(0) @map("avg_price")
+  count5Star       Int      @default(0) @map("count_5_star")
+  count4Star       Int      @default(0) @map("count_4_star")
+  count3Star       Int      @default(0) @map("count_3_star")
+  count2Star       Int      @default(0) @map("count_2_star")
+  count1Star       Int      @default(0) @map("count_1_star")
+  totalReturns     Int      @default(0) @map("total_returns")
+  returnRate       Float    @default(0) @map("return_rate")
+  totalDelivered   Int      @default(0) @map("total_delivered")
+  avgDeliveryDays  Float?   @map("avg_delivery_days")
+  damageRate       Float    @default(0) @map("damage_rate")
+  rankScore        Float    @default(0) @map("rank_score")
+  rankPosition     Int?     @map("rank_position")
+  lastCalculatedAt DateTime @default(now()) @map("last_calculated_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+  company          Company  @relation(fields: [companyId], references: [id])
+
+  @@map("company_ratings_summary")
+}
+
+model Notification {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  type      String
+  title     String
+  message   String
+  data      Json?
+  isRead    Boolean   @default(false) @map("is_read")
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+model ChatMessage {
+  id             String   @id @default(uuid())
+  conversationId String   @map("conversation_id")
+  senderId       String   @map("sender_id")
+  content        String
+  contentType    String   @default("text") @map("content_type")
+  attachments    Json     @default("[]")
+  translatedTo   Json?    @map("translated_to")
+  createdAt      DateTime @default(now()) @map("created_at")
+  sender         User     @relation(fields: [senderId], references: [id])
+
+  @@index([conversationId, createdAt])
+  @@map("chat_messages")
+}
+
+model AiUsageLog {
+  id        String   @id @default(uuid())
+  companyId String?  @map("company_id")
+  service   String
+  model     String
+  tokensIn  Int      @map("tokens_in")
+  tokensOut Int      @map("tokens_out")
+  costUsd   Float    @map("cost_usd")
+  endpoint  String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([companyId, createdAt])
+  @@map("ai_usage_logs")
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userId    String?  @map("user_id")
+  companyId String?  @map("company_id")
+  action    String
+  entity    String
+  entityId  String?  @map("entity_id")
+  details   Json?
+  ipAddress String?  @map("ip_address")
+  createdAt DateTime @default(now()) @map("created_at")
+  company   Company? @relation(fields: [companyId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([companyId, createdAt])
+  @@map("activity_logs")
+}
+
+model Specialization {
+  id        String    @id @default(uuid())
+  slug      String    @unique
+  nameMn    String    @map("name_mn")
+  nameEn    String?   @map("name_en")
+  icon      String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  companies Company[] @relation("CompanyToSpecialization")
+
+  @@map("specializations")
+}
+
+model VerificationRequest {
+  id                 String             @id @default(uuid())
+  entityType         EntityType         @map("entity_type")
+  entityId           String             @map("entity_id")
+  status             VerificationStatus @default(PENDING)
+  isForeign          Boolean            @default(false) @map("is_foreign")
+  country            String?            @map("country")
+  tradingName        String?            @map("trading_name")
+  officialName       String?            @map("official_name")
+  ownerName          String?            @map("owner_name")
+  registrationNumber String?            @map("registration_number")
+  officialAddress    String?            @map("official_address")
+  identityProofUrl   String?            @map("identity_proof_url")
+  businessLicenseUrl String?            @map("business_license_url")
+  livePhotoUrl       String?            @map("live_photo_url")
+  verifiedVia        String             @default("MANUAL") @map("verified_via")
+  rejectionReason    String?            @map("rejection_reason")
+  reviewerId         String?            @map("reviewer_id")
+  reviewedAt         DateTime?          @map("reviewed_at")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
+
+  @@index([entityId])
+  @@map("verification_requests")
+}
+
+model Vehicle {
+  id                 String             @id @default(uuid())
+  driverId           String             @map("driver_id")
+  plateNumber        String             @map("plate_number")
+  model              String
+  type               VehicleType        @default(TRUCK)
+  capacityWeight     Float?             @map("capacity_weight")
+  capacityVolume     Float?             @map("capacity_volume")
+  registrationCert   String?            @map("registration_certificate_url")
+  licensePhotoUrl    String?            @map("license_photo_url")
+  vehiclePhotoUrl    String?            @map("vehicle_photo_url")
+  diagnosticPhotoUrl String?            @map("diagnostic_photo_url")
+  status             VerificationStatus @default(NOT_SUBMITTED)
+  isVerified         Boolean            @default(false) @map("is_verified")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
+  driver             User               @relation(fields: [driverId], references: [id])
+  batches            Batch[]
+
+  @@map("vehicles")
+}
+
+model MarketplaceListing {
+  id           String        @id @default(uuid())
+  title        String
+  description  String
+  type         ListingType
+  status       ListingStatus @default(OPEN)
+  price        Float?
+  currency     String        @default("MNT")
+  volume       Float?        @map("volume_m3")
+  weight       Float?        @map("weight_kg")
+  origin       String?
+  destination  String?
+  userId       String        @map("user_id")
+  companyId    String?       @map("company_id")
+  onlyVerified Boolean       @default(true) @map("only_verified")
+  expiresAt    DateTime?     @map("expires_at")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  company      Company?      @relation(fields: [companyId], references: [id])
+  user         User          @relation(fields: [userId], references: [id])
+  bids         MarketplaceBid[]
+
+  @@index([userId])
+  @@index([companyId])
+  @@index([type])
+  @@index([status])
+  @@map("marketplace_listings")
+}
+
+model MarketplaceBid {
+  id          String    @id @default(uuid())
+  listingId   String    @map("listing_id")
+  bidderId    String    @map("bidder_id") // ID of the User or Company bidding
+  companyId   String?   @map("company_id") // If bidding as a company
+  amount      Float
+  currency    String    @default("MNT")
+  notes       String?
+  status      BidStatus @default(PENDING)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  listing     MarketplaceListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  company     Company?           @relation(fields: [companyId], references: [id])
+  bidder      User               @relation(fields: [bidderId], references: [id])
+  batches     Batch[]
+
+  @@index([listingId])
+  @@index([bidderId])
+  @@map("marketplace_bids")
+}
+
+enum BidStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+enum CompanyStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  SUSPENDED
+  CANCELLED
+}
+
+enum VerificationStatus {
+  NOT_SUBMITTED
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum EntityType {
+  COMPANY
+  USER
+  VEHICLE
+}
+
+enum VehicleType {
+  TRUCK
+  VAN
+  SEMIRAIL
+  TRAILER
+  OTHER
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  CARGO_ADMIN
+  TRANSPORT_ADMIN
+  STAFF_ERLIAN
+  STAFF_MONGOLIA
+  TRANSPORT_STAFF
+  DRIVER
+  CUSTOMER
+  EXTERNAL_API
+}
+
+enum CompanyType {
+  CARGO
+  TRANSPORT
+  BOTH
+  STORE
+}
+
+enum OrderStatus {
+  PENDING
+  PRE_ANNOUNCED
+  MATCHED
+  NOT_RECEIVED
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum PackageStatus {
+  RECEIVED_ORIGIN
+  MEASURED
+  CATEGORIZED
+  SHELVED_ORIGIN
+  BUNDLED
+  BATCHED
+  DEPARTED
+  IN_TRANSIT
+  ARRIVED_HUB
+  SHELVED_HUB
+  READY_FOR_PICKUP
+  DELIVERED
+  RETURNED
+  AT_CUSTOMS
+  CUSTOMS_CLEARED
+  CUSTOMS_HELD
+}
+
+enum BatchStatus {
+  OPEN
+  CLOSED
+  LOADING
+  DEPARTED
+  IN_TRANSIT
+  AT_CUSTOMS
+  ARRIVED
+  UNLOADED
+}
+
+enum ListingType {
+  CARGO_WANTED
+  TRANSPORT_OFFERED
+  LOAD_REQUEST
+}
+
+enum ListingStatus {
+  OPEN
+  ACTIVE
+  CLOSED
+  CANCELLED
+  EXPIRED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+  REFUNDED
+}
+
+enum ReturnType {
+  NOT_ARRIVED_ERLIAN
+  DAMAGED_AT_ERLIAN
+  PROHIBITED_ITEM
+  DAMAGED_IN_TRANSIT
+  LOST_IN_TRANSIT
+  NOT_ARRIVED_UB
+  DAMAGED_AT_UB
+  WRONG_DELIVERY
+  CUSTOMS_HELD
+  CUSTOMS_REJECTED
+  WRONG_ITEM
+  QUALITY_ISSUE
+  OTHER
+}
+
+enum ReturnStatus {
+  OPENED
+  UNDER_REVIEW
+  EVIDENCE_REQUIRED
+  APPROVED
+  REJECTED
+  REFUND_PROCESSING
+  REFUND_COMPLETED
+  CLOSED
+}
+
+enum LiableParty {
+  SELLER
+  INTL_CARRIER
+  HUB_ORIGIN
+  HUB_TRANSIT
+  HUB_DESTINATION
+  CARGO_ERLIAN
+  CARGO_TRANSIT
+  CARGO_MONGOLIA
+  CUSTOMS
+  CUSTOMER
+  UNDETERMINED
+}
+
+enum UnidentifiedStatus {
+  STORED
+  MATCH_SUGGESTED
+  MATCHED
+  EXPIRED
+  DISPOSED
+}
+
+enum CustomsMode {
+  ABSORBED
+  TRANSPARENT
+  HYBRID
+  DISABLED
+}
+
+enum WarehouseType {
+  ORIGIN
+  TRANSIT
+  DESTINATION
+}
+
+enum InsurancePlanSlug {
+  BASIC
+  STANDARD
+  PREMIUM
+}
+
+enum InsuranceStatus {
+  ACTIVE
+  CLAIMED
+  EXPIRED
+  CANCELLED
+}
+
+enum CargoType {
+  ERLIAN_UB
+  ERLIAN_ONLY
+  UB_ONLY
+}
+
+enum PackageCondition {
+  INTACT      // Бүрэн бүтэн
+  DAMAGED     // Гэмтэлтэй
+  OPENED      // Задарсан/Нээгдсэн
+  REPACKAGED  // Дахин багласан
+  WET         // Норсон
+}
+
+enum Language {
+  MN
+  EN
+  CN
+}
+
+enum CargoServiceType {
+  STANDARD
+  FAST
+}
+
+enum QcStatus {
+  NOT_REQUESTED
+  PENDING_PAYMENT
+  PAID
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+model QcTier {
+  id                 String            @id @default(uuid())
+  name               String
+  description        String?
+  price              Float
+  isActive           Boolean           @default(true) @map("is_active")
+  platformSettingsId String?           @map("platform_settings_id")
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
+  orders             Order[]
+  platformSettings   PlatformSettings? @relation(fields: [platformSettingsId], references: [id])
+
+  @@map("qc_tiers")
+}
+
+model DeliveryPoint {
+  id           String            @id @default(uuid())
+  name         String
+  address      String
+  latitude     Float?
+  longitude    Float?
+  contact      String?
+  type         String            @default("BRANCH") // BRANCH, CU, STORABOX, PICKUP_PARTNER
+  companyId    String?           @map("company_id")
+  isActive     Boolean           @default(true) @map("is_active")
+  openingHours String?           @map("opening_hours")
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+  orders       Order[]
+  company      Company?          @relation(fields: [companyId], references: [id])
+
+  @@map("delivery_points")
+}
+
+model Penalty {
+  id          String   @id @default(uuid())
+  companyId   String   @map("company_id")
+  reason      String
+  issuedBy    String   @map("issued_by") // Super Admin ID
+  issuedAt    DateTime @default(now()) @map("issued_at")
+  resolvedAt  DateTime? @map("resolved_at") // If penalty is cleared
+  isActive    Boolean  @default(true) // Counts towards strike limit
+
+  company     Company  @relation(fields: [companyId], references: [id])
+  issuer      User     @relation(fields: [issuedBy], references: [id])
+
+  @@map("penalties")
+}
