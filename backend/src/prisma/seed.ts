@@ -103,7 +103,7 @@ async function main() {
       phone: '88440011',
       firstName: 'Erlian Staff',
       password: staffChinaPwd,
-      role: 'STAFF_CHINA',
+      role: 'STAFF_ERLIAN',
       companyId: company.id,
       otpVerified: true,
       isActive: true,
